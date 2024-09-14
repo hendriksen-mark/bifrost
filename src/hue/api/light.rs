@@ -1,3 +1,4 @@
+use std::collections::BTreeSet;
 use std::ops::{AddAssign, Sub};
 
 use serde::{Deserialize, Serialize};
@@ -14,8 +15,7 @@ pub struct Light {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub product_data: Option<LightProductData>,
 
-    #[serde(default)]
-    pub alert: Value,
+    pub alert: Option<LightAlert>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<LightColor>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,7 +32,7 @@ pub struct Light {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub service_id: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub gradient: Option<Value>,
+    pub gradient: Option<LightGradient>,
     #[serde(default)]
     pub identify: Identify,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -94,7 +94,7 @@ impl Light {
     #[must_use]
     pub const fn new(owner: ResourceLink, metadata: LightMetadata) -> Self {
         Self {
-            alert: Value::Null,
+            alert: None,
             color: None,
             color_temperature: None,
             color_temperature_delta: Some(Stub {}),
@@ -201,6 +201,27 @@ pub enum LightMode {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct LightAlert {
+    action_values: BTreeSet<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialOrd, Ord, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum LightGradientMode {
+    InterpolatedPalette,
+    InterpolatedPaletteMirrored,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct LightGradient {
+    mode: LightGradientMode,
+    mode_values: BTreeSet<LightGradientMode>,
+    points_capable: u32,
+    points: Vec<Value>,
+    pixel_count: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum LightPowerupPreset {
     Safety,
@@ -212,8 +233,68 @@ pub enum LightPowerupPreset {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LightPowerup {
     pub preset: LightPowerupPreset,
-    #[serde(flatten)]
-    pub data: Value,
+
+    pub configured: bool,
+    #[serde(default, skip_serializing_if = "LightPowerupOn::is_none")]
+    pub on: LightPowerupOn,
+    #[serde(default, skip_serializing_if = "LightPowerupDimming::is_none")]
+    pub dimming: LightPowerupDimming,
+    #[serde(default, skip_serializing_if = "LightPowerupColor::is_none")]
+    pub color: LightPowerupColor,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[serde(tag = "mode", rename_all = "snake_case")]
+pub enum LightPowerupOn {
+    #[default]
+    None,
+    Previous,
+    On {
+        on: On,
+    },
+}
+
+impl LightPowerupOn {
+    pub const fn is_none(&self) -> bool {
+        matches!(self, Self::None)
+    }
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[serde(tag = "mode", rename_all = "snake_case")]
+pub enum LightPowerupColor {
+    #[default]
+    None,
+    Previous,
+    Color {
+        color: ColorUpdate,
+    },
+    ColorTemperature {
+        color_temperature: ColorTemperatureUpdate,
+    },
+}
+
+impl LightPowerupColor {
+    pub const fn is_none(&self) -> bool {
+        matches!(self, Self::None)
+    }
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[serde(tag = "mode", rename_all = "snake_case")]
+pub enum LightPowerupDimming {
+    #[default]
+    None,
+    Previous,
+    Dimming {
+        dimming: DimmingUpdate,
+    },
+}
+
+impl LightPowerupDimming {
+    pub const fn is_none(&self) -> bool {
+        matches!(self, Self::None)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
