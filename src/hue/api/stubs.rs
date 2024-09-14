@@ -20,6 +20,14 @@ pub struct BridgeHome {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Diyhue {
+    pub owner: ResourceLink,
+    pub remote_api_enabled: bool,
+    pub hue_essentials_key: String,
+    pub remote_discovery: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Button {
     pub owner: ResourceLink,
     pub metadata: ButtonMetadata,

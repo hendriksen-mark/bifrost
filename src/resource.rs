@@ -350,6 +350,7 @@ impl Resources {
             | Resource::Temperature(_)
             | Resource::ZigbeeConnectivity(_)
             | Resource::Zone(_)
+            | Resource::Diyhue(_)
             | Resource::ZigbeeDeviceDiscovery(_) => None,
         }
     }

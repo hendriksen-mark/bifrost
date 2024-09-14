@@ -41,6 +41,7 @@ pub enum RType {
     ZigbeeConnectivity,
     ZigbeeDeviceDiscovery,
     Zone,
+    Diyhue,
 }
 
 fn hash<T: Hash + ?Sized>(t: &T) -> u64 {

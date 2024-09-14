@@ -25,7 +25,7 @@ pub use stubs::{
     Entertainment, EntertainmentConfiguration, EntertainmentSegment, EntertainmentSegments,
     GeofenceClient, Geolocation, GroupedLightLevel, GroupedMotion, Homekit, LightLevel, Matter,
     Metadata, Motion, PrivateGroup, PublicImage, RelativeRotary, SmartScene, Taurus, Temperature,
-    TimeZone, ZigbeeConnectivity, ZigbeeConnectivityStatus, ZigbeeDeviceDiscovery, Zone,
+    TimeZone, ZigbeeConnectivity, ZigbeeConnectivityStatus, ZigbeeDeviceDiscovery, Zone, Diyhue
 };
 pub use update::{Update, UpdateRecord};
 
@@ -76,6 +76,7 @@ pub enum Resource {
     ZigbeeConnectivity(ZigbeeConnectivity),
     ZigbeeDeviceDiscovery(ZigbeeDeviceDiscovery),
     Zone(Zone),
+    Diyhue(Diyhue)
 }
 
 impl Resource {
@@ -113,6 +114,7 @@ impl Resource {
             Self::ZigbeeConnectivity(_) => RType::ZigbeeConnectivity,
             Self::ZigbeeDeviceDiscovery(_) => RType::ZigbeeDeviceDiscovery,
             Self::Zone(_) => RType::Zone,
+            Self::Diyhue(_) => RType::Diyhue,
         }
     }
 
@@ -149,6 +151,7 @@ impl Resource {
             RType::ZigbeeConnectivity => Self::ZigbeeConnectivity(from_value(obj)?),
             RType::ZigbeeDeviceDiscovery => Self::ZigbeeDeviceDiscovery(from_value(obj)?),
             RType::Zone => Self::Zone(from_value(obj)?),
+            RType::Diyhue => Self::Diyhue(from_value(obj)?),
         };
         Ok(res)
     }
@@ -228,6 +231,7 @@ resource_conversion_impl!(Temperature);
 resource_conversion_impl!(ZigbeeConnectivity);
 resource_conversion_impl!(ZigbeeDeviceDiscovery);
 resource_conversion_impl!(Zone);
+resource_conversion_impl!(Diyhue);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct V2Reply<T> {
